@@ -1,0 +1,161 @@
+{
+	"info": {
+		"_postman_id": "e78e05e5-d390-48c4-892d-3e9728d73c7e",
+		"name": "Playground mp-jwt-auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get JWT",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "playground-auth",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "john doe",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/realms/playground/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"realms",
+						"playground",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				},
+				"description": "http://localhost:8080/auth/realms/playground/protocol/openid-connect/token"
+			},
+			"response": []
+		},
+		{
+			"name": "Call secured endpoint",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGYjFWR09lRnNkMTNLNXAtbEZfY2NzQnB1THZ0WU5YZ1VhQU14RUQtcHpjIn0.eyJqdGkiOiIxNGZjMDAyYy05YjA4LTQ0M2QtOGE0MC01ODc0OThjYTUxM2MiLCJleHAiOjE1MjQ1NzM3NTQsIm5iZiI6MCwiaWF0IjoxNTI0NTU1NzU0LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvcGxheWdyb3VuZCIsImF1ZCI6InBsYXlncm91bmQtYXV0aCIsInN1YiI6ImM3Mzc1OTczLTdiMjgtNGUzNy1iYzkwLWQwZGJiNzJiMjEwMiIsInR5cCI6IkJlYXJlciIsImF6cCI6InBsYXlncm91bmQtYXV0aCIsImF1dGhfdGltZSI6MCwic2Vzc2lvbl9zdGF0ZSI6IjJkZTk5MzJiLWUxYWMtNGY3Yy1hNWRiLTFlZTNmY2E2NTZhYiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOltdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlci1yb2xlIiwiZ3JvdXAtcm9sZSIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwidXBuIjoiam9obi5kb2VAZXhhbXBsZS5vcmciLCJuYW1lIjoiSm9obiBEb2UiLCJncm91cHMiOlsidW1hX2F1dGhvcml6YXRpb24iLCJ1c2VyLXJvbGUiLCJvZmZsaW5lX2FjY2VzcyIsImdyb3VwLXJvbGUiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiam9obiBkb2UiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiZW1haWwiOiJqb2huLmRvZUBleGFtcGxlLm9yZyJ9.JaG302AEf-rtex_Zg7KIvsdFOH0VzkAiREgX8hdMuzQmpPLeU4RW8F9SU_kmYD70V_iEEBVJp2EC3dahnnkj5Xqw9wuAcdsfnl10QWedOvzGMv1r5SsAOQwLJieYCFkg-ameaHXd8EdnmTZLJd8lFXEiR599fx6atCvH8KuQ557y_LzlEIOJwYxkVmT0TXjXGmizbaTUpMOTskrFQOntzte_MNMuG60MlBYY3jfc4y20vREYBtbakgBljEJyCXuVGp6L87_CzqMLLCGKJwtiNAmvvKEggU7V7m0Kh1HatOCaWncrGHtUU9HkdA3bT4TUZnXHKnRXe1x-9NNn16TwZA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8100/playground/secure",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"playground",
+						"secure"
+					]
+				},
+				"description": "http://localhost:8100/playground/secure"
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Info",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJGYjFWR09lRnNkMTNLNXAtbEZfY2NzQnB1THZ0WU5YZ1VhQU14RUQtcHpjIn0.eyJqdGkiOiI4ODdmMDdhOS1jYmNlLTQ4MmEtYWEzNi0zMDhkNzA3ZGE1OGUiLCJleHAiOjE1MjQ1NzI4NzgsIm5iZiI6MCwiaWF0IjoxNTI0NTU0ODc4LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvcGxheWdyb3VuZCIsImF1ZCI6InBsYXlncm91bmQtYXV0aCIsInN1YiI6ImM3Mzc1OTczLTdiMjgtNGUzNy1iYzkwLWQwZGJiNzJiMjEwMiIsInR5cCI6IkJlYXJlciIsImF6cCI6InBsYXlncm91bmQtYXV0aCIsImF1dGhfdGltZSI6MCwic2Vzc2lvbl9zdGF0ZSI6IjAzMWQ3ZWIwLWU4MGQtNGNmYy1hNDVmLTkwNWNhMmU1NTlhZiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOltdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsidXNlci1yb2xlIiwiZ3JvdXAtcm9sZSIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwidXBuIjoiam9obi5kb2VAZXhhbXBsZS5vcmciLCJuYW1lIjoiSm9obiBEb2UiLCJncm91cHMiOlsidW1hX2F1dGhvcml6YXRpb24iLCJ1c2VyLXJvbGUiLCJvZmZsaW5lX2FjY2VzcyIsImdyb3VwLXJvbGUiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiam9obiBkb2UiLCJnaXZlbl9uYW1lIjoiSm9obiIsImZhbWlseV9uYW1lIjoiRG9lIiwiZW1haWwiOiJqb2huLmRvZUBleGFtcGxlLm9yZyJ9.XQ8UKn4Vi09Kpf52Xfth7UzVa_nRkTRVM2bOPETMjHp_Wi3rRSfD5P8xSlu-TAlaRjA7lQWxU7X3S5i89Dlk2phrdf55PXXSBJaLxlveopw83IZ60n2AbohuDhnPNjlVY-18n3e8661Ql2U-3EslhTE4GSKkrlgtO31J1RoAhyyPSmTiiUHJIRFd_DvC5ntLrFlJg_e-oha9iXAykHnE5BIbVAdBreCopkQN50gUrF0lANa6TUDKkf8F_cMpdr9OM49aRVytCoCfHPl1aYTLJSCSZUN2sosP6xEA-Ap2A91fp3tQ3g3qQYAxX1Y7woPe6CLfarkPmFDVObnZoGvHfg",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/auth/realms/playground/protocol/openid-connect/userinfo",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"realms",
+						"playground",
+						"protocol",
+						"openid-connect",
+						"userinfo"
+					]
+				},
+				"description": "http://localhost:8080/auth/realms/playground/protocol/openid-connect/userinfo"
+			},
+			"response": []
+		},
+		{
+			"name": "Call unsecured endpoint",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8100/playground/unsecure",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"playground",
+						"unsecure"
+					]
+				},
+				"description": "http://localhost:8100/playground/unsecure"
+			},
+			"response": []
+		}
+	]
+}

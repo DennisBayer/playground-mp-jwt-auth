@@ -1,0 +1,84 @@
+swarm:
+
+  logging: TRACE
+
+  debug:
+    port: 5005
+
+  port:
+    offset: 20
+
+#  deployment:
+#    playground-mp-jwt-auth.war:
+#      web:
+#        login-config:
+#          auth-method: MP-JWT
+#          realm-name: mp-jwt-realm
+#        security-constraints:
+#          - url-pattern: /playground/*
+#            methods: [GET]
+#            roles: [user-role]
+#        security-role:
+#          role-name: user-role
+
+  security:
+    security-domains:
+      mp-jwt-realm:
+        jaspi-authentication:
+          login-module-stacks:
+            roles-lm-stack:
+              login-modules:
+                # This stack performs the token verification and group to role mapping
+                - login-module: rm
+                  code: org.wildfly.swarm.microprofile.jwtauth.deployment.auth.jaas.JWTLoginModule
+                  flag: required
+                  module-options:
+                    rolesProperties: jwt-roles.properties
+          auth-modules:
+          # This module integrates the MP-JWT custom authentication mechanism into the web container
+            http:
+              code: org.wildfly.extension.undertow.security.jaspi.modules.HTTPSchemeServerAuthModule
+              module: org.wildfly.extension.undertow
+              flag: required
+              login-module-stack-ref: roles-lm-stack
+
+#  microprofile:
+#   jwtauth:
+#      token:
+#        issuedBy: "http://localhost:8080/auth/realms/playground"
+
+  keycloak:
+    secure-deployments:
+      playground-mp-jwt-auth.war:
+        realm: playground
+        resource: playground-client
+        auth-server-url: http://localhost:8080/auth
+        bearer-only: true
+        ssl-required: none
+        autodetect-bearer-only: true
+        use-resource-role-mappings: false
+
+# working
+#        realm: playground
+#        resource: playground-client
+#        auth-server-url: http://localhost:8080/auth
+#        bearer-only: true
+#        ssl-required: none
+#        autodetect-bearer-only: true
+
+# playground-auth
+#        realm: playground
+#        auth-server-url: http://localhost:8080/auth
+#        ssl-required: external
+#        resource: playground-auth
+#        public-client: true
+#        confidential-port: 0
+
+# playground-client
+#        realm: playground
+#        bearer-only: true
+#        auth-server-url: http://localhost:8080/auth
+#        ssl-required: external
+#        resource: playground-client
+#        confidential-port: 0
+
