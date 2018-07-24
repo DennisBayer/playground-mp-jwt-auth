@@ -89,19 +89,25 @@ public class PlaygroundEndpoint {
 	    return "No security principal.";
 	}
 
-	return String.format("Principal name [%s], isInUserRole [%b].",
-		this.securityContext.getUserPrincipal().getName(), this.securityContext.isUserInRole("user-role"));
+	return String.format("Principal name [%s], isInGroupRole [%b].",
+		this.securityContext.getUserPrincipal().getName(), this.securityContext.isUserInRole("group-role"));
     }
 
     private String getJsonWebTokenInfo() {
-	return "No jwt.";
+	// return "No jwt."; jsonWebToken.getName()
 	// Cannot use this logic, because declaration of jsonWebToken leads to
 	// cdi injection failure.
-	// boolean isJwtTokenSet = this.jsonWebToken != null;
-	// if (!isJwtTokenSet) {
-	// return "No jwt.";
-	// }
-	//
+	boolean isJwtTokenSet = this.jsonWebToken != null;
+	if (!isJwtTokenSet) {
+	    return "No jwt.";
+	}
+
+	try {
+	    return String.format("Groups [%s].", this.jsonWebToken.getGroups());
+	} catch (Exception e) {
+	    return "No jwt variable resolving.";
+	}
+
 	// return String.format("Raw token [%s], groups [%s].",
 	// this.jsonWebToken.getRawToken(),
 	// this.jsonWebToken.getGroups());
