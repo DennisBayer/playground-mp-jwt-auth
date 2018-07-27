@@ -1,5 +1,9 @@
 # README
 
+## Update 2
+
+The patch was merged into the keycloak adapter <https://github.com/keycloak/keycloak/pull/5222>.
+
 ## Update 1
 
 I did some debugging and noticed that `org.wildfly.extension.undertow.security.jaspi.JASPICAuthenticationMechanism.authenticate(HttpServerExchange, SecurityContext)` is reading the context which was set by the `KeycloakAdapter`;
