@@ -75,9 +75,16 @@
 			<groupId>org.wildfly.swarm</groupId>
 			<artifactId>microprofile</artifactId>
 		</dependency>
+		<!-- Use adapter directly instead of fraction until fraction is updated to at least 4.1.0.
+		     This release contains a fix about passing security roles properly. -->
+		<!-- 		<dependency> -->
+		<!-- 			<groupId>io.thorntail</groupId> -->
+		<!-- 			<artifactId>keycloak</artifactId> -->
+		<!-- 		</dependency> -->
 		<dependency>
-			<groupId>org.wildfly.swarm</groupId>
-			<artifactId>keycloak</artifactId>
+		    <groupId>org.keycloak</groupId>
+		    <artifactId>keycloak-wildfly-adapter</artifactId>
+		    <version>4.1.0.Final</version>
 		</dependency>
 	</dependencies>
 </project>
