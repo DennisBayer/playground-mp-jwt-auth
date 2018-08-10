@@ -1,5 +1,118 @@
 = README
 
+== Update 2
+
+The patch was merged into the keycloak adapter <https://github.com/keycloak/keycloak/pull/5222>.
+
+== Update 1
+
+I did some debugging and noticed that `org.wildfly.extension.undertow.security.jaspi.JASPICAuthenticationMechanism.authenticate(HttpServerExchange, SecurityContext)` is reading the context which was set by the `KeycloakAdapter`;
+
+[source,java]
+----
+if (isValid) {
+  // The CBH filled in the JBOSS SecurityContext, we need to create an Undertow account based on that
+  org.jboss.security.SecurityContext jbossSct = SecurityActions.getSecurityContext();
+  authenticatedAccount = createAccount(cachedAccount, jbossSct);
+  updateSubjectRoles(jbossSct);
+}
+----
+
+At this point the roles cannot be read, because the `SecurityContext` which was previously set by `org.keycloak.adapters.wildfly.WildflyRequestAuthenticator` does not contain any roles. The request authenticator tries to add roles into the context which were discovered by the keycloak adapter. For this a `SubjectInfo` is created and the subject is passed which was filled with role information. During `createSubjectInfo` the roles are ommited (see comment in code below).
+
+If the roles are re-added to the new `SubjectInfo` the call of the secured endpoint works. The method `mapGroupMembersOfAuthenticatedSubjectIntoSubjectInfo` is a proof-of-concept - not to be considered as a final patch, as I'm not very deep into the security handling.
+
+*Question* Is this the root cause and can be fixed by the keycload wildfly adapter-team or the defect located elsewhere in the flow?
+
+[source,java]
+----
+@Override
+protected void propagateKeycloakContext(KeycloakUndertowAccount account)
+{
+    super.propagateKeycloakContext(account);
+    SecurityInfoHelper.propagateSessionInfo(account);
+    log.debug("propagate security context to wildfly");
+    Subject subject = new Subject();
+    Set<Principal> principals = subject.getPrincipals();
+    principals.add(account.getPrincipal());
+    Group[] roleSets = getRoleSets(account.getRoles());
+    for (int g = 0; g < roleSets.length; g++)
+    {
+        Group group = roleSets[g];
+        String name = group.getName();
+        Group subjectGroup = createGroup(name, principals);
+        if (subjectGroup instanceof NestableGroup)
+        {
+            /* A NestableGroup only allows Groups to be added to it so we
+            need to add a SimpleGroup to subjectRoles to contain the roles
+            */
+            SimpleGroup tmp = new SimpleGroup("Roles");
+            subjectGroup.addMember(tmp);
+            subjectGroup = tmp;
+        }
+        // Copy the group members to the Subject group
+        Enumeration<? extends Principal> members = group.members();
+        while (members.hasMoreElements())
+        {
+            Principal role = members.nextElement();
+            subjectGroup.addMember(role);
+        }
+    }
+    // add the CallerPrincipal group if none has been added in getRoleSets
+    Group callerGroup = new SimpleGroup(SecurityConstants.CALLER_PRINCIPAL_GROUP);
+    callerGroup.addMember(account.getPrincipal());
+    principals.add(callerGroup);
+    org.jboss.security.SecurityContext sc = SecurityContextAssociation.getSecurityContext();
+    Principal userPrincipal = getPrincipal(subject);
+    sc.getUtil().createSubjectInfo(userPrincipal, account, subject);
+
+    // Roles of subjectInfo are null, because is was constructed by
+    // org.jboss.security.identity.extensions.CredentialIdentityFactory
+    //   .createIdentity(Principal [=userPrincipal], Object [=account], Role [=null]).
+    // Therefore the roles are only contained in the authenticatedSubject (member of subjectInfo)
+    // and subsequent logics do only access subjecctInfo#roles instead of authenticatedSubject#roles.
+    mapGroupMembersOfAuthenticatedSubjectIntoSubjectInfo(sc.getSubjectInfo());
+}
+
+private void mapGroupMembersOfAuthenticatedSubjectIntoSubjectInfo(SubjectInfo subjectInfo)
+{
+    if (subjectInfo == null)
+    {
+        return;
+    }
+
+    Subject authenticatedSubject = subjectInfo.getAuthenticatedSubject();
+    if (authenticatedSubject == null)
+    {
+        return;
+    }
+
+    // Get role group of subjectInfo in order to add roles of authenticatedSubject.
+    RoleGroup scRoles = subjectInfo.getRoles();
+    if (scRoles == null)
+    {
+        scRoles = new SimpleRoleGroup("Roles");
+        subjectInfo.setRoles(scRoles);
+    }
+
+    // Get group roles of authenticatedSubject and add them into subjectInfo
+    Iterator<Principal> principalItr = authenticatedSubject.getPrincipals().iterator();
+    while (principalItr.hasNext())
+    {
+        Principal principal = principalItr.next();
+        if (principal instanceof Group)
+        {
+            Enumeration<? extends Principal> members = ((Group) principal).members();
+            while (members.hasMoreElements())
+            {
+                Principal role = members.nextElement();
+                scRoles.addRole(new SimpleRole(role.getName()));
+            }
+        }
+    }
+}
+----
+
 == Abstract
 
 * Requesting a secured rest resource fails with a _403 Forbidden_ using
@@ -8,7 +121,6 @@ resource just as to the unsecured one, once the jwt bearer token was
 added to the request.
 
 == Preface
-
 
 * Configuration file for keycloak are provided in `export/keycloak`
 * Request samples can be imported in postman and are provided in
@@ -19,7 +131,6 @@ added to the request.
 ** https://github.com/wildfly-swarm/wildfly-swarm-examples/tree/master/security/keycloak
 
 == Instructions
-
 
 === Install Keycloak
 
